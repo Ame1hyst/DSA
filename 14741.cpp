@@ -1,68 +1,62 @@
 #include <cstdio>
 
-const int MAXN = 1000001;
+struct Node
+{
+    int data;
+    Node *next;
+};
 
-int val[MAXN];   
-int next[MAXN];   
-int cur_num = 0;    
-int head = -1;  
-int tail = -1;   
+Node *create_node(int num){
+    Node *new_node = new Node;
+    new_node->data = num;
+    new_node->next = NULL;
+    return new_node;
+}
+
+
 
 int main(){
-    int n;
-    scanf("%d", &n);
+    int M; scanf("%d ", &M);
+    Node *head = NULL, *tail = NULL;
+    for(int i = 0; i < M; i++){
+        char op[101]; scanf("%s", op);
 
-    for(int i = 0; i < n; i++){
-        char com[100];
-        scanf("%s", com);
-
-        if(com[4] == 'n'){
-            int N;
-            scanf("%d", &N);
-
-            val[cur_num] = N;
-            next[cur_num] = -1;
-            if(head == -1){
-                head = tail = cur_num;
+        if(op[0] == 'n'){
+            if(op[4] == 'n'){
+                int N; scanf("%d", &N);
+                Node *node = create_node(N);
+                if(!head) {head = tail = node;}
+                else {tail->next = node; tail = node;}
             }
-            else{
-                next[tail] = cur_num;
-                tail = cur_num;
-            }
-            cur_num++;
-        }
-        else if(com[4] == 's'){
-            int N, P;
-            scanf("%d %d", &N, &P);
-
-            val[cur_num] = N;
-            if(P == 0){
-                next[cur_num] = head;
-                head = cur_num;
-            }
-            else{
-                int cur = head;
-                for(int j = 0; j < P - 1; j++){
-                    cur = next[cur];      // walk to position P-1
+            else if(op[4] == 's'){
+                int N, P; scanf("%d %d", &N, &P);
+                Node *node = create_node(N);
+                if(P == 0){
+                    node->next = head;
+                    head = node;
+                    if(!tail) tail = node;
                 }
-                next[cur_num] = next[cur];
-                next[cur] = cur_num;
-                if(tail == cur) tail = cur_num;
+                else{
+                    Node *cur = head;
+                    while(--P) cur = cur->next;
+                    node->next = cur->next;
+                    cur->next = node;
+                    
+                }
             }
-            cur_num++;
         }
-        else if(com[0] == 'd'){
-            head = next[head];
-            if(head == -1) tail = -1;
-        }
-        else if(com[0] == 'p'){
-            int cur = head;
-            while(cur != -1){
-                printf("%d", val[cur]);
-                if(next[cur] != -1) printf(" ");
-                cur = next[cur];
+        else if(op[0] == 'p'){
+            for(Node *cur = head; cur != NULL; cur = cur->next){
+                printf("%d", cur->data);
+                if(cur->next) printf(" ");
             }
             printf("\n");
+        }
+        else if(op[0] == 'd'){
+            Node *temp = head;
+            head = head->next;
+            if(!head) tail = NULL;
+            delete temp;
         }
     }
 
